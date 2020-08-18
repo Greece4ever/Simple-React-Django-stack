@@ -1,0 +1,5 @@
+#Static Files
+external_root/
+
+#SQLite3
+*.sqlite3

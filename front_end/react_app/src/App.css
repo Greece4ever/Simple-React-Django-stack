@@ -1,0 +1,3 @@
+@keyframes spinning {
+  to {transform: rotate(360deg);}
+}

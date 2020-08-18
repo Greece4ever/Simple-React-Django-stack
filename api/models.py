@@ -9,7 +9,7 @@ import  os
 # Create your models here.
 
 def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    #external_root/users/<user:pk>/repositories/<repository:id>/<source_file:file>
     return 'source-files/users/{}/repositories/{}/{}'.format(instance.creator.id,instance.parent_repository,instance.file)
 
 class SourceFileQueryset(models.QuerySet):
@@ -35,13 +35,13 @@ class source_file(models.Model):
         os.remove(file_path)
         super(source_file,self).delete(*args,**kwargs)
 
-
-
 class repository(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500,blank=True)
     files = models.ManyToManyField(source_file,related_name='source_files',blank=True)
-
+    owner = models.ForeignKey(User,related_name='owner',on_delete=models.CASCADE)
+    public = models.BooleanField()
 
     def __str__(self):
         return f'{self.name}'
+

@@ -57,17 +57,14 @@ class RepositoryView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
 
     def list(self,request,*args,**kwargs):
         """Simple API Response To see if a repository name"""
-        data = request.data
+        name = request.GET.get('name')
         user = request.user
 
         #Validate Authentication
         if not user.is_authenticated:
             return Response({"error" : "Failed to Authenticate"})
         
-        #Get the name
-        name = data.get('name')
-
-        return Response({"error" if repository.objects.filter(owner=user).filter(name=name).exists() else "success" : 0})
+        return Response({"error" if repository.objects.filter(owner=user).filter(name=name).exists() else "success" : True})
 
 
 

@@ -14,6 +14,7 @@ const RepositoryCreate = () => {
     const [readOnly,setReadOnly] = useState(false)
     const [typing,setTyping] = useState('')
     const [availabe,setAvailabe] = useState('')
+    const [isDisabled,setIsDisabled] = useState(false);
 
     const history = useHistory();
     const handleSubmit = (event) => {
@@ -50,12 +51,25 @@ const RepositoryCreate = () => {
 
     useEffect(() => {
         async function checkIsAvailable() {
-            const response =  await checkRepositoryNameAvailability(typing,'token')
-            console.log(response)
+            const response =  await checkRepositoryNameAvailability(typing,token)
+            if(response.data.error) 
+            {
+                setAvailabe(prev => <b className="text-danger" style={{"marginLeft" : "9px"}}>(Taken)</b>)
+                setIsDisabled(true);
+            }
+            else if (typing == '') {
+                setIsDisabled(true);
+            }
+            else {
+                setAvailabe(prev => <b className="text-success" style={{"marginLeft" : "9px"}}>(Availabe)</b>)
+                setIsDisabled(false);
+
+            }
         }
         const timeout = setTimeout(() => {
             checkIsAvailable();
         },1000)
+        return () => clearTimeout(timeout)
     },[typing])
 
     return(
@@ -80,7 +94,7 @@ const RepositoryCreate = () => {
                         <label style={{"position" : ''}} className="form-check-label" for="exampleCheck1"><i className="fas fa-user-lock"></i><span style={{"marginLeft" : "10px"}}>Private</span></label>
                     </div>
                     <div style={{"marginTop" : "10px"}}>
-                        <button onClick={(event) => handleSubmit(event)} type="submit" className="btn btn-primary">Submit</button>
+                        <button onClick={(event) => handleSubmit(event)} type="submit" className="btn btn-primary" disabled={isDisabled}>Submit</button>
                         <button style={{"marginLeft" : "20px"}} type="submit" className="btn btn-danger">Cancel</button>
                     </div>
                 </form>

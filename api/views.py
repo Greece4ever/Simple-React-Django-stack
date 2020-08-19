@@ -126,15 +126,30 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
     def create(self,request,*args,**kwargs):
         user = request.user
 
-        repository_pk = request.POST.get("id")
-        file_name = request.POST.get("file_name")
-        data = request.POST.get("data")
+        INFO = request.data
+
+        repository_pk = INFO["id"]
+        file_name = INFO["name"]
+        data = INFO["data"]
+        size = INFO["size"]
+
+        print("\n\n Received Request \n\n")
+        print(repository_pk)
+        print(file_name)
+        print(size)
+
 
         if not user.is_authenticated:
             return Response({"error" : "not authenticated"})
 
+        try:
+            repository_pk = int(repository_pk)
+        except:
+            return Response({"error" : "Invalid ID"})
+
+
         repo = repository.objects.filter(id=repository_pk)
-        
+
         if not repo.exists():
             return Response({"error" : "Repository Does not exist"})
 

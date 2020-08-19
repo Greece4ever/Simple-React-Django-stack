@@ -28,6 +28,17 @@ export const DetailRepository = (user,id,token)                                 
                                                                                             }                                                           
 
 
-export const fetchScript = (url) => {
-    return axios.get(url)
+export const UploadFile = (name,size,data,token,id) => {
+    return axios.post('http://localhost:8000/apiconfig/files/new/',{
+        id : id,
+        name : name,
+        size : size,
+        data : data
+    },
+    {
+        headers: { Authorization : `Token ${token}` }
+    }
+    );
 }
+
+

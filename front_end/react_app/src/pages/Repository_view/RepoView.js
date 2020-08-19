@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react';
 import {DetailRegExpRepository,matchDetailRegExp,capitalizeFirst} from "../../settings";
 import {useHistory} from "react-router-dom";
-import {DetailRepository} from "../ajax/ajax";
+import {DetailRepository,UploadFile} from "../ajax/ajax";
 import Header from "../components/header";
 import Collapse from "./collapse";
 import FilePreview from "./file_view";
@@ -15,6 +15,7 @@ const RepoView = () => {
     const [name,setName] = useState('');
     const [files,setFiles] = useState([]);
     const [fileURI,setFileURI] = useState('');
+    const [id,setID] = useState('')
 
 
     const REGEXP = /^http:(\/)(\/)localhost:3000(\/)repositories(\/)\w+(\/)?$/
@@ -28,6 +29,7 @@ const RepoView = () => {
             history.push('/404')
             return () => {}
         }
+        setID(isMatch[0])
         async function fetchRepository() {
             const response = await DetailRepository(isMatch[1],isMatch[0],token)
             if(response.data.error) {
@@ -65,10 +67,8 @@ const RepoView = () => {
         let name = data.name;
         let size = data.size;
         let text = await data.text()
-        console.log(name)
-        console.log(size)
-        console.log(text)
-
+        let response = await UploadFile(name,size,text,token,id)
+        console.log(response)
     }
 
     return(

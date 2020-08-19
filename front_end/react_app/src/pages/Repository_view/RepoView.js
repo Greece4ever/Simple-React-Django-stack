@@ -47,10 +47,11 @@ const RepoView = () => {
             setUser(capitalizeFirst(isMatch[1]))
             setName(response.data.name)
             let x = response.data.files;
+            console.log(x)
             let list = [];
             for (let item in x) 
             {
-                list.push({"name" :x[item][0].replace(/source-files(\/)(\w+)(\/)(\w+)(\/)(\w+)(\/)(\w+)(\/)/,''),"url" : x[item]})
+                list.push({"name" :x[item][0].replace(/source-files(\/)(\w+)(\/)(\w+)(\/)(\w+)(\/)(\w+)(\/)/,''),"url" : `http://localhost:8000/media/${x[item][0]}`})
             }
             setFiles(list)
         }
@@ -58,6 +59,18 @@ const RepoView = () => {
 
     },[])
  
+    async function handleFile()  {
+        let element = document.getElementById('file');
+        let data = element.files[0]
+        let name = data.name;
+        let size = data.size;
+        let text = await data.text()
+        console.log(name)
+        console.log(size)
+        console.log(text)
+
+    }
+
     return(
         <div>
             <Header />
@@ -73,18 +86,18 @@ const RepoView = () => {
                     <div style={{"marginLeft" : "30px"}}>{user}</div>
                     <div style={{"position": "absolute",right : "2px",top : "-5px"}}>
                         <label className="btn btn-default btn-file">
-                            <i class="fas fa-upload"></i><input id="file" type="file" style={{display: "none"}}></input>
+                            <i class="fas fa-upload"></i><input onChange={() => handleFile()} id="file" type="file" style={{display: "none"}}></input>
                         </label>
                     </div>
                 </div>
-                <div style={{border : "2px solid #e6e6e6",borderRadius : "1px",minHeight : "400px"}}>
+                <div style={{border : "2px solid #e6e6e6",borderRadius : "1px"}}>
                     {/* <header>{name}</header> */}
                     {files.length < 1 ? instructions : files.map(item => (
                         <Collapse setFileURI={setFileURI} url={item.url} name={item.name} />
                     ))}
 
                 </div>
-                <FilePreview />
+                <FilePreview file_name={fileURI} />
             </div>
         </div>
     )

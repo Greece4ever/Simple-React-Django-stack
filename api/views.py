@@ -124,7 +124,39 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
     queryset = source_file.objects.all()
 
     def create(self,request,*args,**kwargs):
-        pass
+        user = request.user
+
+        repository_pk = request.POST.get("id")
+        file_name = request.POST.get("file_name")
+        data = request.POST.get("data")
+
+        if not user.is_authenticated:
+            return Response({"error" : "not authenticated"})
+
+        repo = repository.objects.filter(id=repository_pk)
+        
+        if not repo.exists():
+            return Response({"error" : "Repository Does not exist"})
+
+        repo = repo.first()
+
+        if not repo.owner == user:
+            return Response({"error" : "Not the owner of this repository"})
+
+        if repo.files.filter(file=f'source-files/users/{user.pk}/repositories/{repo.pk}/{file_name}').exists():
+            return Response({"error" : "File already exists"})
+
+        import os
+        from django.conf import settings
+
+        target = os.path.join(settings.BASE_DIR,'media','users',f'{user.pk}','repositories',f'{repo.pk}')
+        return Response({"hello" : f"{target}"})
+
+
+
+
+
+
 
     def list(self,request,*args,**kwargs):
         #Request User

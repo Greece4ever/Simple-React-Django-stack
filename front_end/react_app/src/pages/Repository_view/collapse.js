@@ -3,7 +3,7 @@ import React from 'react';
 
 const Collapse = (props) => {
     return(
-        <div data-toggle="modal" data-target="peos" onClick={() => {props.setFileURI(props.url)}} style={{"border" : "0"}} id="accordion">
+        <div data-toggle="modal" data-target="#peos" onClick={() => {props.setFileURI(props.url)}} style={{"border" : "0"}} id="accordion">
             <div style={{"border" : "0"}} className="card">
                 <div style={{"borderRadius" : "0",MozBoxShadow : "none",height : "10px"}} className="card-header" id="headingOne">
                 <h5 className="mb-0">

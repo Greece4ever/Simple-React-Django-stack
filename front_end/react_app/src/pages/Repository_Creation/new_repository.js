@@ -30,15 +30,18 @@ const RepositoryCreate = () => {
         async function handleAjax() {
             setDisabled(true)
             const response = await createRepository(name,description,token,dsa);
+
             if (response.data.error) {
                 setMSG([response.data.error,'danger'])
             }
             else {
-                console.log(response.data)
                 setMSG([`Successfuly created ${response.data.success.private ? 'Private' : 'Public'} repository "${response.data.success.name}"!`,'success'])
                 setReadOnly(true)
+                const user = response.data.success.user;
+                const id = response.data.success.id;
                 setTimeout(() => {
-                    history.push('/')
+                    history.push(`/repository/${user}/${id}`)
+                    return () => {}
                 },1000)
 
             }

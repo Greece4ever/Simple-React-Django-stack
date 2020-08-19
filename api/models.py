@@ -41,6 +41,7 @@ class repository(models.Model):
     files = models.ManyToManyField(source_file,related_name='source_files',blank=True)
     owner = models.ForeignKey(User,related_name='owner',on_delete=models.CASCADE)
     public = models.BooleanField()
+    date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f'{self.name}'

@@ -22,7 +22,7 @@ export const checkRepositoryNameAvailability = (name,token) =>
     return axios.get(`${target}?name=${name}`,{headers : {Authorization : `Token ${token}`}});
 }
 
-export const DetailRepository = (user,name,token)                                       => {
-    let target = PATH.join('apiconfig','repositories','view','detail',`${user}`,`${name}`)
+export const DetailRepository = (user,id,token)                                       => {
+    let target = `http://localhost:8000/apiconfig/repositories/view/?id=${id}&user=${user}`
     return axios.get(target,{headers: {Authorization : `Token ${token}`}})
-                                                                                            }                                                        
+                                                                                            }                                                           

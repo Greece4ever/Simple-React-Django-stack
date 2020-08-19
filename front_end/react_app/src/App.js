@@ -9,8 +9,8 @@ const App = () => {
     <Router>
       <Switch>
         <Route path="/repositories/new" exact component={RepositoryCreate} />
-        <Route path="/repositories/:user" component={RepoView} />
-        <Route path="/repository/:user_id/:repo_name" component={RepoViewDetail} />
+        <Route path="/repositories/:user" component={RepoViewDetail} />
+        <Route path="/repository/:user_id/:repo_id" component={RepoView} />
       </Switch>
     </Router>
   )

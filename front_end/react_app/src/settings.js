@@ -14,11 +14,14 @@ class path {
 
 export var BASE_URL = 'http://localhost:8000';
 export var PATH = new path(BASE_URL)
-const DetailRegExp = /^http:(\/)(\/)localhost:3000(\/)repository(\/)(\w+)(\/)(\w+)(\/)?$/
+export const DetailRegExpSource = /^http:(\/)(\/)localhost:3000(\/)repository(\/)(\w+)(\/)(\w+)(\/)?$/
+export const DetailRegExpRepository = /^http:(\/)(\/)localhost:3000(\/)repository(\/)(\w+)(\/)(\w+)(\/)?$/
+
+// BASE_URL/repositories/user/id
 
 
-export const matchDetailRegExp = (expression) => {
-    if (!DetailRegExp.test(expression)) return [null,null];
+export const matchDetailRegExp = (expression,regExpPattern) => {
+    if (!regExpPattern.test(expression)) return [null,null];
     expression = expression.split('/')
     let f = [];
     for (let item in expression) {
@@ -28,3 +31,19 @@ export const matchDetailRegExp = (expression) => {
     return [expression[f.length-1],expression[f.length-2]]
 }
 
+export var capitalizeFirst = (word) => 
+{
+    let CACHE = [];
+    for (let letter in word)
+    {
+        switch(true)
+        {
+            case (word[letter] === word[0] && letter == 0):
+                CACHE.push(word[letter].toUpperCase());
+                break;
+            default:
+                CACHE.push(word[letter]);
+        }
+    }
+    return (CACHE.join(""));
+}

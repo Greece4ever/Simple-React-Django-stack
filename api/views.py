@@ -11,7 +11,7 @@ import json
 from .validators import maxRepositorySize
 
 
-
+#For creating repositories
 class RepositoryView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
     """For the creation of new repositories"""
 
@@ -66,8 +66,6 @@ class RepositoryView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         
         return Response({"error" if repository.objects.filter(owner=user).filter(name=name).exists() else "success" : True})
 
-
-
 class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
     serializer_class = SourceFileSerializer
     queryset = source_file.objects.all()
@@ -76,6 +74,22 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         pass
 
     def list(self,request,*args,**kwargs):
-        pass
+        #Request User
+        user = request.GET.get('user')
+        
+        #Repository Name and Owner
+        repositories = request.GET.get('repository')
+        user_quer = request.GET.get('user')
 
+        #fetch the repository
+        repo = repository.objects.filter(owner=user_quer).filter(name=repositories)
 
+        #Check if it exists
+        if not repo.exists():
+            return Response({"error" : "404 does not exist"})
+
+        #Check if the repository is public and if it is check if the request.user is the owner
+        if not repo.public and repo.owner != user:
+            return Response({"error" : "403 invalid permissions"})
+
+        

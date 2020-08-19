@@ -16,9 +16,13 @@ export const createRepository = (name,description,token,isPrivate) => {
 
 }
 
-
 export const checkRepositoryNameAvailability = (name,token) => 
 {
     const target = PATH.join('apiconfig','repositories','new/');
     return axios.get(`${target}?name=${name}`,{headers : {Authorization : `Token ${token}`}});
 }
+
+export const DetailRepository = (user,name,token)                                       => {
+    let target = PATH.join('apiconfig','repositories','view','detail',`${user}`,`${name}`)
+    return axios.get(target,{headers: {Authorization : `Token ${token}`}})
+                                                                                            }                                                        

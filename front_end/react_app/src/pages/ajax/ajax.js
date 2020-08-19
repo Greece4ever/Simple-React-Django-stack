@@ -26,3 +26,8 @@ export const DetailRepository = (user,id,token)                                 
     let target = `http://localhost:8000/apiconfig/repositories/view/?id=${id}&user=${user}`
     return axios.get(target,{headers: {Authorization : `Token ${token}`}})
                                                                                             }                                                           
+
+
+export const fetchScript = (url) => {
+    return axios.get(url)
+}

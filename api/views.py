@@ -112,7 +112,7 @@ class RepositoryViewView(mixins.ListModelMixin,viewsets.GenericViewSet):
             "name" : repo.name,
             "description" : repo.description,
             "public" : repo.public,
-            "files" : [(file.file,file.size,file.pk) for file in repo.files.all()],
+            "files" : [(str(file),file.file.size,file.pk) for file in repo.files.all()],
             "date_created" : str(repo.date_created.date())
         }
 

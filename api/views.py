@@ -118,7 +118,7 @@ class RepositoryViewView(mixins.ListModelMixin,viewsets.GenericViewSet):
 
         return Response(data)
 
-
+#NOT TODO DO NO USE THIS VIEW
 class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
     serializer_class = SourceFileSerializer
     queryset = source_file.objects.all()
@@ -129,16 +129,7 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         INFO = request.data
 
         repository_pk = INFO["id"]
-        file_name = INFO["name"]
-        data = INFO["data"]
-        size = INFO["size"]
-
-        print("\n\n Received Request \n\n")
-        print(repository_pk)
-        print(file_name)
-        print(size)
-
-
+        
         if not user.is_authenticated:
             return Response({"error" : "not authenticated"})
 
@@ -158,19 +149,44 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         if not repo.owner == user:
             return Response({"error" : "Not the owner of this repository"})
 
-        if repo.files.filter(file=f'source-files/users/{user.pk}/repositories/{repo.pk}/{file_name}').exists():
-            return Response({"error" : "File already exists"})
+
+        file = INFO.get('file')
+
+
+        #Check if file is greater than 2.5mb
+        file_size = file.size #in bytes
+        if(file_size > 2500000):
+            return Response({"error" : "File cannot be greater than 2.5 MiB"})
 
         import os
         from django.conf import settings
 
-        target = os.path.join(settings.BASE_DIR,'media','users',f'{user.pk}','repositories',f'{repo.pk}')
-        return Response({"hello" : f"{target}"})
+        file_name = file.name
 
+        option_0 = os.path.join(settings.BASE_DIR,'external_root','source-files','users',f'{user.pk}','repositories',f'{repo.name}',f'{file_name}')
+        option_1 = f'source-files/users/{user.pk}/repositories/{repo.name}/{file_name}'
+        
+        bool_0 = repo.files.filter(file=option_0).exists()
+        bool_1 = repo.files.filter(file=option_1).exists()
 
+        if(bool_0 or bool_1):
+            return Response({"error" : "File already exists at local repository {}".format(repo.name)})
 
+        target = os.path.join(settings.BASE_DIR,'external_root','source-files','users',f'{user.pk}','repositories',f'{repo.name}')
+        
+        with open(os.path.join(target,file_name),'wb') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
 
+        file_obj = source_file(creator=user,file=os.path.join(target,file_name))
+        file_obj.save()
 
+        repo.files.add(file_obj)
+
+        return Response({"success" : {
+            "name" : file_name,
+            "url" : file_obj.file.url,
+        }})
 
 
     def list(self,request,*args,**kwargs):
@@ -192,4 +208,24 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         if not repo.public and repo.owner != user:
             return Response({"error" : "403 invalid permissions"})
 
-        
+class UploadFile(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
+    serializer_class = SourceFileSerializer
+    queryset = source_file.objects.all()
+    
+    def create(self,request,*args,**kwargs):
+        data = request.data
+
+        file = data.get('file')
+
+        #Check if file is greater than 2.5mb
+        file_size = file.size #in bytes
+        if(file_size > 2500000):
+            return Response({"error" : "File cannot be greater than 2.5 MiB"})
+
+
+        return Response([file.size/8])
+    def list(self,request,*args,**kwargs):
+        pass
+
+
+

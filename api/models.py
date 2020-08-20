@@ -24,7 +24,6 @@ class source_file(models.Model):
     creator = models.ForeignKey(User,on_delete=models.CASCADE)
     file = models.FileField(upload_to=user_directory_path,validators=[max_file_size])
     date_uploaded = models.DateTimeField(default=timezone.now)
-    parent_repository = models.ForeignKey(to='repository',on_delete=models.CASCADE,default=None)
 
     def __str__(self):
         return f'{self.file}'

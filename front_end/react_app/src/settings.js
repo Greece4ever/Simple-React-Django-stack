@@ -47,3 +47,9 @@ export var capitalizeFirst = (word) =>
     }
     return (CACHE.join(""));
 }
+
+export const getFileName=(path)=>{
+    let splitted = path.split('/');
+    if (splitted.length ===1){splitted=path.split('\\')}
+    return splitted[splitted.length-1];
+}

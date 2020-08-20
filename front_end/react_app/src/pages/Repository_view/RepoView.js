@@ -1,10 +1,11 @@
 import React,{useState,useEffect} from 'react';
-import {DetailRegExpRepository,matchDetailRegExp,capitalizeFirst} from "../../settings";
+import {DetailRegExpRepository,matchDetailRegExp,capitalizeFirst,getFileName} from "../../settings";
 import {useHistory} from "react-router-dom";
 import {DetailRepository,UploadFile} from "../ajax/ajax";
 import Header from "../components/header";
 import Collapse from "./collapse";
 import FilePreview from "./file_view";
+import axios from 'axios';
 
 const RepoView = () => {
     
@@ -16,6 +17,8 @@ const RepoView = () => {
     const [files,setFiles] = useState([]);
     const [fileURI,setFileURI] = useState('');
     const [id,setID] = useState('')
+
+    const[error,setError] = useState('');
 
 
     const REGEXP = /^http:(\/)(\/)localhost:3000(\/)repositories(\/)\w+(\/)?$/
@@ -53,7 +56,7 @@ const RepoView = () => {
             let list = [];
             for (let item in x) 
             {
-                list.push({"name" :x[item][0].replace(/source-files(\/)(\w+)(\/)(\w+)(\/)(\w+)(\/)(\w+)(\/)/,''),"url" : `http://localhost:8000/media/${x[item][0]}`})
+                list.push({"name" : getFileName(x[item][0]),"url" : `http://localhost:8000/media/${x[item][0]}`})
             }
             setFiles(list)
         }
@@ -63,24 +66,42 @@ const RepoView = () => {
  
     async function handleFile()  {
         let element = document.getElementById('file');
+        var formData = new FormData();
         let data = element.files[0]
-        let name = data.name;
-        let size = data.size;
-        let text = await data.text()
-        let response = await UploadFile(name,size,text,token,id)
+
+        formData.append("file",data)
+        formData.append("id",id)
+
+        function sendData() {
+            return axios.post('http://localhost:8000/apiconfig/files/new/',formData,{headers : {
+                'Content-Type': 'multipart/form-data',
+                Authorization : `Token ${token}`
+            }})    
+        }
+
+        const response = await sendData();
         console.log(response)
+
+        if(response.data.error)
+        {setError(<div class="alert alert-danger" role="alert">{response.data.error}</div>
+      );return () =>{}}
+        
+        setFiles(prev => [...prev,{name : response.data.success.name,"url" : `http://localhost:8000${response.data.success.url}`}])
+        setError('')
     }
 
     return(
         <div>
             <Header />
-            <div className="jumbotron jumbotron-fluid">
+            <div style={{"marginBottom" : "0"}} className="jumbotron jumbotron-fluid">
                 <div style={{"textAlign" : "center"}} className="container">
                     <h1 className="display-5"><b style={{"color" : "#0f618c"}}>{user}</b>'s Repositories</h1>
                     <p style={{"marginTop" : "20px"}} className="lead"><button className="btn btn-success">View More Repositories</button></p>
                 </div>
             </div>
-            <div className="container">
+            {error}
+
+            <div style={{"marginTop" : "50px"}} className="container">
                 <div style={{"backgroundColor" : "rgba(0,0,0,.03)",border : "3px solid rgba(0,0,0,.03)",position : "relative"}}>
                     <i style={{position : "absolute",marginTop : "4px",mariginLeft : "50px"}} class="fas fa-user"></i>
                     <div style={{"marginLeft" : "30px"}}>{user}</div>
@@ -99,8 +120,19 @@ const RepoView = () => {
                 </div>
                 <FilePreview file_name={fileURI} />
             </div>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+
         </div>
-    )
+)
 }
 
 

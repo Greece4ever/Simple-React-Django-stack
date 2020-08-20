@@ -11,6 +11,33 @@ from django.contrib.auth.models import User
 #Validation
 from .validators import maxRepositorySize
 
+#Queries
+from django.db.models import Count
+from random import choices
+
+#Built in method
+# def count(array,term):
+#     count = 0
+#     for item in array:
+#         if item == term:
+#             count +=1
+#     return count
+
+def filterDuplicate(array : list) -> list:
+    """Best remove duplicate in 2020"""
+    DUPLICATES = {}
+    for item in array:
+        count = array.count(item)
+        if array.count(item) > 1:
+            DUPLICATES[item] = count
+    response = []
+    for item in array:
+        if not item in DUPLICATES:
+            response.append(item)
+    print(response)
+    for duplicate in DUPLICATES:
+        response.append(duplicate)
+    return response
 
 #For creating repositories
 class RepositoryView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
@@ -38,13 +65,25 @@ class RepositoryView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         if repository.objects.filter(owner=user).filter(name=name).exists():
             return Response({"error" : "A repository named '{}' already exists in your repositories".format(name)})
 
-
         #Validate Crededentials
         try:
             maxRepositorySize(name=name,description= description)
             assert type(private) == bool , 'Type of "private" must be boolean!'
         except Exception as f:
             return Response({"error" : str(f)})
+
+
+        #Create the directory for that file
+        import os
+        from django.conf import settings
+
+        #Get The location and mkdir
+        path = os.path.join(settings.BASE_DIR,'external_root','source-files','users',str(request.user.pk),'repositories',name)
+        try:
+            os.makedirs(path)
+        except:
+            #names such as CON and AUX in windows
+            return Response({"error" : "The name '{}' is invalid.".format(name)})
 
         repo = repository(name=name,description=description,owner=user,public=private)
         repo.save()
@@ -118,7 +157,6 @@ class RepositoryViewView(mixins.ListModelMixin,viewsets.GenericViewSet):
 
         return Response(data)
 
-#NOT TODO DO NO USE THIS VIEW
 class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
     serializer_class = SourceFileSerializer
     queryset = source_file.objects.all()
@@ -227,5 +265,31 @@ class UploadFile(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericV
     def list(self,request,*args,**kwargs):
         pass
 
+class ListRepository(mixins.ListModelMixin,viewsets.GenericViewSet):
+    queryset = repository.objects.all()
+    serializer_class = RepositorySerializer
+
+    def list(self,request,*args,**kwargs):
+        keyword = request.GET.get("search")
+        query = repository.objects.all()
+
+        if (keyword is not None and keyword.strip() != ''):
+            query = query.filter(name__icontains=keyword)
+
+        x = filterDuplicate(choices(query,k=4))
+        DATA =[]
+        for item in x:
+            DATA.append({
+                "name" : item.name,
+                "description" : item.description,
+                "date_created" : item.date_created,
+                "id" : item.pk,
+                "files" : item.files.count(),
+                "user" : item.owner.username
+            })
+        return Response(DATA)
+
+if __name__ == "__main__":
+    print(filterDuplicate([1,1,3,4,5])) 
 
 

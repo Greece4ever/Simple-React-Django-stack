@@ -41,4 +41,6 @@ export const UploadFile = (name,size,data,token,id) => {
     );
 }
 
-
+export const ListRepository = (search=null) => {
+    return axios.get(`http://localhost:8000/apiconfig/repositories/list/${!search ? '' : `?search=${search}`}`)
+}

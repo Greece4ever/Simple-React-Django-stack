@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom';
 
 const RepositoryCreate = () => {
 
-    const token = '5234eb22a7cfd2076fc89e7ac37fe03620ed3dcc'
+    const [token,setToken] = useState(localStorage.getItem("auth_key"))
     
     const [disabled,setDisabled] = useState(false)
     const [msg,setMSG] = useState(['',''])
@@ -51,6 +51,12 @@ const RepositoryCreate = () => {
         
     }
 
+    useEffect(() => {
+        if(!token) {
+            history.push("/accounts/auth")
+            return () => {}
+        }
+    },[token])
 
     useEffect(() => {
         async function checkIsAvailable() {

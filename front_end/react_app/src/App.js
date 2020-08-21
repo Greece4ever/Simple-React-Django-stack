@@ -4,6 +4,7 @@ import RepositoryCreate from "./pages/Repository_Creation/new_repository";
 import RepoView from "./pages/Repository_view/RepoView";
 import RepoViewDetail from "./pages/Repository_view/RepoViewDetail";
 import  Home from "./pages/home/home";
+import Authenticate from "./pages/simple_authentication/authenticate";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <Route path="/repositories/new" exact component={RepositoryCreate} />
         <Route path="/repositories/:user" component={RepoViewDetail} />
         <Route path="/repository/:user_id/:repo_id" component={RepoView} />
+        <Route path="/accounts/auth" component={Authenticate} />
       </Switch>
     </Router>
   )

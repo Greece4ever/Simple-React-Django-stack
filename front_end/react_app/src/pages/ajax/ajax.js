@@ -44,3 +44,17 @@ export const UploadFile = (name,size,data,token,id) => {
 export const ListRepository = (search=null) => {
     return axios.get(`http://localhost:8000/apiconfig/repositories/list/${!search ? '' : `?search=${search}`}`)
 }
+
+
+export const checkAuthentication = (token=null) => {
+    return axios.get('http://localhost:8000/apiconfig/accounts/is_authenticated/',{
+        Authorization : `Token ${token}`
+    });
+}
+
+export const makeAuthentication = (username,password) => {
+    return axios.post('http://localhost:8000/apiconfig/accounts/ViewOrCreate/',{
+        username : username,
+        password : password
+    })
+}

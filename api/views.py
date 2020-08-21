@@ -4,12 +4,13 @@ from rest_framework import viewsets,mixins
 from rest_framework.response import  Response
 
 # Database Tables / Serialization
-from .serializers import (RepositorySerializer,SourceFileSerializer)
+from .serializers import (RepositorySerializer,SourceFileSerializer,UserSerialzer)
 from .models import repository,source_file
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,auth
 
 #Validation
 from .validators import maxRepositorySize
+from rest_framework.authtoken.models import Token
 
 #Queries
 from django.db.models import Count
@@ -176,7 +177,6 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         except:
             return Response({"error" : "Invalid ID"})
 
-
         repo = repository.objects.filter(id=repository_pk)
 
         if not repo.exists():
@@ -246,6 +246,7 @@ class SourceFileView(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gene
         if not repo.public and repo.owner != user:
             return Response({"error" : "403 invalid permissions"})
 
+#For testing
 class UploadFile(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
     serializer_class = SourceFileSerializer
     queryset = source_file.objects.all()
@@ -288,6 +289,57 @@ class ListRepository(mixins.ListModelMixin,viewsets.GenericViewSet):
                 "user" : item.owner.username
             })
         return Response(DATA)
+
+#Simple view for user creation for temproary project
+class UserCreation(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
+    serializer_class = UserSerialzer
+    queryset = User.objects.all()
+
+    def create(self,request,*args,**kwargs):
+        request_data = request.data
+
+        if(not 'username' in request_data or not 'password' in request_data):
+            return Response({"error" : "Username or Password was not provided"})
+
+        username = request_data.get('username')
+        password = request_data.get('password')
+
+        if(not len(username) > 1 or not len(password) > 1):
+            return Response({"error" : "All fields must be greater than 1 characters"})
+
+        if(User.objects.filter(username=username).exists()):
+            user = auth.authenticate(username=username,password=password)
+            if user is None:
+                return Response({"error" : "Failed to authenticate"})
+            return Response({"success" : {"username" : user.username}})
+
+        user = User(username=username)
+        user.save()
+        user.set_password(password)
+
+        token = Token(user=user)
+        token.save()
+
+        return Response({"success" : {
+            "username" : username,
+            "token" : str(token.key)
+        }})
+
+
+    def list(self,request,*args,**kwargs):
+        username = request.GET.get("username")
+
+        if(User.objects.filter(username=username).exists()):
+            return Response({"error" : "Username '{}' already exists".format(username)})
+        return Response({"success" : "{}".format(username)})
+
+class checkAuthentication(mixins.ListModelMixin,viewsets.GenericViewSet):
+    queryset = User.objects.all()
+
+    def list(self,request,*args,**kwargs):
+        if(request.user.is_authenticated):
+            return Response([True])
+        return Response([False])
 
 if __name__ == "__main__":
     print(filterDuplicate([1,1,3,4,5])) 

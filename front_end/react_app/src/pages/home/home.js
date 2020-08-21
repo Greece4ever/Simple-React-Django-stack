@@ -37,7 +37,7 @@ const Home = () => {
             <div style={{"width" : "100%",height : "100%",margin : "0px","overflow": "hidden",textAlign : "center"}} className="jumbotron jumbotron-fluid">
                 <div s className="container">
                     <h1 className="display-4">Browse Repositories</h1>
-                    <p className="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+                    <p className="lead">or If you want, create one <a href="http://localhost:3000/repositories/new" target="_blank" rel="noopener noreferrer">here</a>.</p>
                 </div>
                 <hr></hr>
                 {search.trim() == '' ? '' : <div className="text-muted" style={{"position" : "absolute",left : "50%",transform : "translate(-50%)"}}>Showing search results for <kbd style={{"marginLeft" : "5px"}}>{search}</kbd></div>}                <i style={{"fontSize" : "200px",textAlign : "center",marginTop : "50px"}} class="fas fa-laptop-code"></i>

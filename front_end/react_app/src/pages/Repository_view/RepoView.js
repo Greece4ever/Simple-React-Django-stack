@@ -9,7 +9,15 @@ import axios from 'axios';
 
 const RepoView = () => {
     
-    const token = '5234eb22a7cfd2076fc89e7ac37fe03620ed3dcc';
+    const [token,setToken] = useState(localStorage.getItem("auth_key"))
+
+    useEffect(() => {
+        if(!token) {
+            history.push("/accounts/auth")
+            return () => {}
+        }
+    },[token])
+
     const history = useHistory();
 
     const [user,setUser] = useState('');
@@ -40,16 +48,17 @@ const RepoView = () => {
         async function fetchRepository() {
             const response = await DetailRepository(isMatch[1],isMatch[0],token)
             if(response.data.error) {
+                console.log(response.data.error)
                 switch(true)
                 {
                     case response.data.error.includes('404'):
-                        history.push("/404")
+                        history.push("/")
                         return () => {}
                     case response.data.error.includes('403'): 
-                        history.push("/404")
+                        history.push("/")
                         return () => {}
                     default:
-                        history.push('/404')
+                        history.push('/')
                         return () => {}
                 }
             }

@@ -62,7 +62,7 @@ ROOT_URLCONF = 'project_0.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,"front_end","react_app","build")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,3 +137,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,"front_end","react_app","build","static"),
+]
